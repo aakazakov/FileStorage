@@ -20,14 +20,14 @@ public class Server {
       int edge;
       
       String fileName = in.readUTF();
-      File file = new File(fileName);
+      File file = new File("./src/main/java/org/filestorage/common/prototype/storage/" + fileName);
       if (file.exists()) file.delete();
       file.createNewFile();
+      
       System.out.println("File " + file.getName() + " created.");
       
       FileOutputStream fos = new FileOutputStream(file);
       while ((edge = in.read(buffer)) != -1) {
-        System.out.println("server edge: " + edge);
         fos.write(buffer, 0, edge);
       }      
       fos.close();

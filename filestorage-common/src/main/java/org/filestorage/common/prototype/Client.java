@@ -23,7 +23,6 @@ public class Client {
       out.writeUTF(file.getName());
       
       while ((edge = in.read(buffer)) != -1) {
-        System.out.println("client edge: " + edge);
         out.write(buffer, 0, edge);
       }         
     } catch (IOException e) {
