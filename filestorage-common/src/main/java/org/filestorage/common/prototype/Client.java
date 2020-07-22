@@ -16,10 +16,6 @@ public class Client {
     Client client = new Client();
     client.showListOfFiles();
     
-       
-    
-    client.showListOfFiles();
-    
   }
   
   public void connect() {
@@ -44,6 +40,7 @@ public class Client {
          DataOutputStream os = new DataOutputStream(socket.getOutputStream());) {
       byte[] buffer = new byte[8192];
       int read;
+      os.writeUTF(file.getName());
       while ((read = is.read(buffer)) != -1) {
         os.write(buffer, 0, read);
       }
