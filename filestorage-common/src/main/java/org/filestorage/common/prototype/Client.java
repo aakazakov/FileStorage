@@ -2,35 +2,38 @@ package org.filestorage.common.prototype;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class Client {
   Socket socket;
   DataOutputStream out;
-  ClientHandler clientHandler;
   
   public Client() throws IOException {
     socket = new Socket(Common.HOST, Common.PORT);
     out = new DataOutputStream(socket.getOutputStream());
+    interraction();
   }
   
-  public void initHandler(ClientHandler clientHandler) {
-    this.clientHandler = clientHandler;
+  private void interraction() throws IOException {
+    Scanner scanner = new Scanner(System.in);
+    String query = "";
+    while (!query.equals("/q")) {
+      System.out.println("Query: ");
+      query = scanner.nextLine();
+      send(query);
+    }
+  }
+  
+  private void send(String query) throws IOException {
+    out.write(query.getBytes());
   }
   
   public static void main(String[] args) {
-    Client client;
     try {
-      client = new Client();
-      
-      File file = new File("D:\\TEMP\\Robert Nystrom - Game Programming Patterns.pdf");
-      client.put(file);
-      
+      new Client();
     } catch (IOException e) {
       e.printStackTrace();
-    }
- 
-
-        
+    }       
   }
   
   private void put(File file) {
