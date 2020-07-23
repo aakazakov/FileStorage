@@ -37,15 +37,14 @@ public class Server {
   
   private void interraction(Socket socket) throws IOException {
     System.out.println("== interraction ==");
-    StringBuilder query = new StringBuilder();
+    String query;
     try {
       while (!socket.isClosed()) {
-       query.setLength(0);
        System.out.println("server is waiting for query...");
        byte[] buffer = new byte[8192];
        int edge = in.read(buffer);
-       query.append(new String(buffer, 0, edge));
-       System.out.println(query);
+       query = new String(buffer, 0, edge);
+       controller(query);
       }
     } catch (SocketException e) {
       // TODO SocketException handling.
@@ -53,7 +52,8 @@ public class Server {
     }   
   }
   
-  private void controller(String query) {
+  private void controller(String query) { // TODO ArrayIndexOfBoundException...
+    System.out.println(query);
     String[] arr = query.split(Common.DELIMETER);
     String command = arr[0];
     if (command.equals(Common.EXIT_CODE)) {
@@ -64,6 +64,8 @@ public class Server {
       getList();
     } else if (command.equals(Common.GET_FILE_CODE)) {
       getFile(arr[1]);
+    } else {
+      System.out.println("The server does not understand the client (((");
     }
   }
   

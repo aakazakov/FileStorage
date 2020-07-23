@@ -16,11 +16,16 @@ public class Client {
   
   private void interraction() throws IOException {
     Scanner scanner = new Scanner(System.in);
-    String query = "";
-    while (!query.equals("/q")) {
-      System.out.print("Query: ");
-      query = scanner.nextLine();
-      send(query);
+    StringBuilder query = new StringBuilder();
+    String command;
+    while (true) {
+      query.setLength(0);
+      System.out.print("Command: ");
+      command = scanner.nextLine();
+      if (command.equals("/q")) { break; }
+      System.out.print("Source (if need or press Enter): ");
+      query.append(command).append(Common.DELIMETER).append(scanner.nextLine());
+      send(query.toString());
     }
     scanner.close();
   }
