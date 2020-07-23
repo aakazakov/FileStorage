@@ -3,6 +3,7 @@ package org.filestorage.common.prototype;
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.Arrays;
 import java.net.ServerSocket;
 
 public class Server {
@@ -53,7 +54,6 @@ public class Server {
   }
   
   private void controller(String query) { // TODO ArrayIndexOfBoundException...
-    System.out.println(query);
     String[] arr = query.split(Common.DELIMETER);
     String command = arr[0];
     if (command.equals(Common.EXIT_CODE)) {
@@ -65,12 +65,27 @@ public class Server {
     } else if (command.equals(Common.GET_FILE_CODE)) {
       getFile(arr[1]);
     } else {
-      System.out.println("The server does not understand the client (((");
+      System.out.println("The server does not understand the client's query");
     }
   }
   
-  private void put(String path) {
-    System.out.println("put: " + path);
+  private void put(String fileName) {
+    FileOutputStream fos;
+    try {
+      File file = new File(Common.PATH_TO_STORAGE + fileName);
+      if (file.exists()) { file.delete(); }
+      file.createNewFile();
+      fos = new FileOutputStream(file);
+      byte[] buffer = new byte[8192];
+      int edge;
+      while ((edge = in.read(buffer)) != -1) {
+        fos.write(buffer, 0, edge);
+      }
+      fos.close();
+      System.out.println("File " + fileName + " uploaded.");
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
   
   private void getList() {

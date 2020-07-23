@@ -23,9 +23,15 @@ public class Client {
       System.out.print("Command: ");
       command = scanner.nextLine();
       if (command.equals("/q")) { break; }
+      query.append(command);
+      System.out.print("File name (if need or press Enter): ");
+      query.append(Common.DELIMETER).append(scanner.nextLine());
       System.out.print("Source (if need or press Enter): ");
-      query.append(command).append(Common.DELIMETER).append(scanner.nextLine());
+      String source = scanner.nextLine();
       send(query.toString());
+      if (command.equals(Common.PUT_CODE)) {
+        put(new File(source));
+      }
     }
     scanner.close();
   }
@@ -43,12 +49,9 @@ public class Client {
   }
   
   private void put(File file) {
-    try (InputStream in = new FileInputStream(file)) {     
+    try (InputStream in = new FileInputStream(file)) {
       byte[] buffer = new byte[8192];
       int edge;
-      
-      out.writeUTF(file.getName());
-      
       while ((edge = in.read(buffer)) != -1) {
         out.write(buffer, 0, edge);
       }         

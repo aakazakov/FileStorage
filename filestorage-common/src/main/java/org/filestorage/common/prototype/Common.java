@@ -11,6 +11,8 @@ public class Common {
   public static final String GET_FILE_CODE = "/getfile";
   public static final String GET_LIST_CODE = "/getlist";
   
+  public static final String PATH_TO_STORAGE = "./src/main/java/org/filestorage/common/prototype/storage/";
+  
   private Common() {
     
   }
