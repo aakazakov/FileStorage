@@ -10,5 +10,8 @@ public class Common {
   public static final String PUT_CODE = "/put";
   public static final String GET_FILE_CODE = "/getfile";
   public static final String GET_LIST_CODE = "/getlist";
-
+  
+  private Common() {
+    
+  }
 }
