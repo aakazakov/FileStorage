@@ -2,6 +2,7 @@ package org.filestorage.common.prototype;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.ServerSocket;
 
 public class Server {
@@ -37,15 +38,19 @@ public class Server {
   private void interraction(Socket socket) throws IOException {
     System.out.println("== interraction ==");
     StringBuilder query = new StringBuilder();
-    while (!socket.isClosed()) {
-      query.setLength(0);
-      System.out.println("server is waiting for query...");
-      byte[] buffer = new byte[8192];
-      int edge = in.read(buffer);
-      query.append(new String(buffer, 0, edge));
-      System.out.println(query);
-    }
-    System.out.println("== interraction terminate==");
+    try {
+      while (!socket.isClosed()) {
+       query.setLength(0);
+       System.out.println("server is waiting for query...");
+       byte[] buffer = new byte[8192];
+       int edge = in.read(buffer);
+       query.append(new String(buffer, 0, edge));
+       System.out.println(query);
+      }
+    } catch (SocketException e) {
+      // TODO SocketException handling.
+      System.out.println("== interraction terminated ==");
+    }   
   }
   
   private void controller(String query) {

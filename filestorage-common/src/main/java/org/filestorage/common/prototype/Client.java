@@ -18,10 +18,11 @@ public class Client {
     Scanner scanner = new Scanner(System.in);
     String query = "";
     while (!query.equals("/q")) {
-      System.out.println("Query: ");
+      System.out.print("Query: ");
       query = scanner.nextLine();
       send(query);
     }
+    scanner.close();
   }
   
   private void send(String query) throws IOException {
