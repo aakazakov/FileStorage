@@ -1,0 +1,1 @@
+package org.filestorage.common.prototype;
