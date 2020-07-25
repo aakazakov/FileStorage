@@ -15,11 +15,11 @@ public class Client {
     new Client();
   } 
   
-  public void connect() throws IOException {
+  private void connect() throws IOException {
     socket = new Socket(Common.HOST, Common.PORT);
   }
   
-  public void interaction() {
+  private void interaction() {
     Scanner scanner = new Scanner(System.in);
     StringBuilder query = new StringBuilder();
     while (true) {
@@ -27,18 +27,57 @@ public class Client {
       
       System.out.print("Enter the command: ");
       String command = scanner.nextLine();
-      if (command.equals("/q")) break;
+      if (command.equals(Common.EXIT_CODE)) break;
+      
       query.append(command).append(Common.DELIMETER);
       
-      System.out.print("Enter filename (if needed or press `Enter`): ");
-      query.append(scanner.nextLine());
+      if (command.equals(Common.GET_FILE_CODE)) {
+        System.out.print("Enter filename: ");
+        query.append(scanner.nextLine());
+      }
       
       send(query.toString());
+      
+      if (command.equals(Common.PUT_CODE)) {
+        System.out.print("Enter filename: ");
+        query.append(scanner.nextLine());
+        System.out.print("Enter path: ");
+        put(scanner.nextLine());
+      }
     }   
     scanner.close();
   }
   
-  public void send(String query) {
-    System.out.println("Command: " + query);
+  private void send(String query) {
+    try (DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {
+      out.writeUTF(query);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+  
+  private void put(String src) {
+    try (DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {
+      File file = new File(src);
+      FileInputStream fis = new FileInputStream(file);
+      byte[] buffer = new byte[8192];
+      int edge;
+      while (fis.available() > 0) {
+        edge = fis.read(buffer);
+        out.write(buffer, 0, edge);
+      }
+      out.flush();
+      fis.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+  
+  private void get(String fileName) {
+    System.out.println(fileName);
+  }
+  
+  private void getList() {
+    
   }
 }
