@@ -6,7 +6,7 @@ public class Common {
   public static final int PORT = 8189;
   
   public static final String DELIMETER = "☢";
-  public static final String EXIT_CODE = "/exit";
+  public static final String EXIT_CODE = "/q";
   public static final String PUT_CODE = "/put";
   public static final String GET_FILE_CODE = "/getfile";
   public static final String GET_LIST_CODE = "/getlist";
