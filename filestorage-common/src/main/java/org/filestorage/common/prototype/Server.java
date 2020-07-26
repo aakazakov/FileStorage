@@ -20,7 +20,7 @@ public class Server {
     public void run() {
       System.out.println("Client in thread...");
       
-      while (isRunning || !socket.isClosed()) {
+      while (isRunning) {
         try {         
           String request = in.readUTF();
           
@@ -30,7 +30,8 @@ public class Server {
           }
           
           if (request.equals(Common.GET_FILE_CODE)) {
-            get();
+            request = in.readUTF();
+            get(request);
           }
           
           if (request.equals(Common.GET_LIST_CODE)) {
@@ -55,12 +56,27 @@ public class Server {
           edge = in.read(buffer);
           fos.write(buffer, 0, edge);
         }
-        System.out.println("File in server storage, file length: " + file.length());
+        System.out.println("File in the server storage, file length: " + file.length());
       }  
     }
     
-    private void get() {
-      System.out.println("Server get file");
+    private void get(String filename) throws IOException {
+      File file = new File(Common.PATH_TO_SERVER_STORAGE + filename);
+      if (file.exists()) {
+        out.writeUTF(Common.OK_STATUS);
+        
+        try (FileInputStream fis = new FileInputStream(file)) {
+          byte[] buffer = new byte[1024];
+          int edge;
+          while (fis.available() > 0) {
+            edge = fis.read(buffer);
+            out.write(buffer, 0, edge);
+          }
+        }
+        
+      } else {
+        out.writeUTF(Common.FAIL_STATUS);
+      }
     }
     
     private void getList() {
