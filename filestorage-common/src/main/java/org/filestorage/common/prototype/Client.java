@@ -51,7 +51,7 @@ public class Client {
       }
       
       if (command.equals(Common.GET_LIST_CODE)) {
-        System.out.println("files list");
+        getList();
       }
     }   
     scanner.close();
@@ -64,7 +64,7 @@ public class Client {
       out.writeUTF(file.getName());
       
       try (FileInputStream fis = new FileInputStream(file)) {
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[8192];
         int edge;
         while (fis.available() > 0) {
           edge = fis.read(buffer);
@@ -86,7 +86,7 @@ public class Client {
       file.createNewFile();
       
       try (FileOutputStream fos = new FileOutputStream(file)) {
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[8192];
         int edge;
         while (in.available() > 0) {
           edge = in.read(buffer);
@@ -100,7 +100,9 @@ public class Client {
     }
   }
   
-  private void getList() {
-    
+  private void getList() throws IOException {
+    out.writeUTF(Common.GET_LIST_CODE);
+    String list = in.readUTF();
+    System.out.println(list);
   }
 }

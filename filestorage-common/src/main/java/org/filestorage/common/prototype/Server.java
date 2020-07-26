@@ -50,7 +50,7 @@ public class Server {
       file.createNewFile();
       
       try (FileOutputStream fos = new FileOutputStream(file)) {
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[8192];
         int edge;        
         while (in.available() > 0) {
           edge = in.read(buffer);
@@ -66,7 +66,7 @@ public class Server {
         out.writeUTF(Common.OK_STATUS);
         
         try (FileInputStream fis = new FileInputStream(file)) {
-          byte[] buffer = new byte[1024];
+          byte[] buffer = new byte[8192];
           int edge;
           while (fis.available() > 0) {
             edge = fis.read(buffer);
@@ -79,8 +79,17 @@ public class Server {
       }
     }
     
-    private void getList() {
-      System.out.println("Server list file");
+    private void getList() throws IOException {
+      File file = new File(Common.PATH_TO_SERVER_STORAGE);
+      String[] list = file.list();
+      StringBuilder formatString = new StringBuilder();
+      for (int i = 0; i < list.length; i++) {
+        formatString.append(list[i]);
+        if (i != list.length - 1) {
+          formatString.append("\n");
+        }
+      }
+      out.writeUTF(formatString.toString());
     }
   }
   
