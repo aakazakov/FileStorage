@@ -33,6 +33,11 @@ public class Client {
         connect();
         get(command);
       }
+      
+      if (command.equals(Common.GET_LIST_CODE)) {
+        connect();
+        getList();
+      }
     }
     
     scanner.close();
@@ -96,6 +101,21 @@ public class Client {
         System.out.println("==Client== file length: " + file.length());     
       } else {
         System.out.println("There is no such file in the server storage...");
+      }
+    }
+  }
+  
+  private void getList() throws IOException {
+    try (DataInputStream in = new DataInputStream(socket.getInputStream());
+        DataOutputStream out = new DataOutputStream(socket.getOutputStream());) {
+      System.out.println("i/o streams has been created...");
+      
+      out.writeUTF(Common.GET_LIST_CODE);
+      String response = in.readUTF();
+      if (response.equals("")) {
+        System.out.println("There are no files in the server storage...");
+      } else {
+        System.out.println(response);
       }
     }
   }

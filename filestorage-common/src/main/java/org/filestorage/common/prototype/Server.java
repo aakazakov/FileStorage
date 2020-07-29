@@ -36,6 +36,10 @@ public class Server {
       if (command.equals(Common.GET_FILE_CODE)) {
         get();
       }
+      
+      if (command.equals(Common.GET_LIST_CODE)) {
+        getList();
+      }
     }
 
     private void put() throws IOException {
@@ -85,6 +89,21 @@ public class Server {
           out.writeUTF(Common.OK_STATUS);
         }
       }
+      quite();
+    }
+    
+    private void getList() throws IOException {
+      try (DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {
+        StringBuilder list = new StringBuilder();
+        File storage = new File(Common.PATH_TO_SERVER_STORAGE);
+        String[] files = storage.list();
+        for (int i = 0; i < files.length; i++) {
+          if (files[i].startsWith(".")) continue;
+          list.append(files[i]).append("\n");
+        }
+        out.writeUTF(list.toString());
+      }
+      quite();
     }
     
     private void quite() throws IOException {
