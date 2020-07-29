@@ -86,7 +86,7 @@ public class Server {
           System.out.println("==Server== file length: " + file.length());
         } else {
           System.out.println("File " + filename + " does not exist in the server storage...");
-          out.writeUTF(Common.OK_STATUS);
+          out.writeUTF(Common.FAIL_STATUS);
         }
       }
       quite();
