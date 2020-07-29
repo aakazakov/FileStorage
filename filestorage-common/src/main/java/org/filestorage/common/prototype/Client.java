@@ -25,6 +25,14 @@ public class Client {
         connect();
         put(new File(command));
       }
+      
+      if (command.equals(Common.GET_FILE_CODE)) {
+        System.out.print("Filename: ");
+        command = scanner.nextLine();
+        
+        connect();
+        get(command);
+      }
     }
     
     scanner.close();
@@ -56,6 +64,39 @@ public class Client {
       System.out.println("==Client== file length: " + file.length());
     } else {
       System.out.println("File does not exist...");
+    }
+  }
+  
+  private void get(String filename) throws IOException {
+    try (DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+        DataInputStream in = new DataInputStream(socket.getInputStream());) {     
+      System.out.println("i/o streams has been created...");
+      
+      out.writeUTF(Common.GET_FILE_CODE);
+      out.writeUTF(filename);
+      
+      String response = in.readUTF();
+      if (response.equals(Common.OK_STATUS)) {
+        File file = new File(Common.PATH_TO_CLIENT_STORAGE + filename);
+        if (file.exists()) file.delete();
+        file.createNewFile();
+        
+        OutputStream fos = new FileOutputStream(file);
+        
+        byte[] buffer = new byte[8192];
+        int edge;
+        
+        System.out.println("Bytes are ready to be recieved...");
+        while ((edge = in.read(buffer)) != -1) {
+          fos.write(buffer, 0, edge);
+        }
+        
+        fos.close();
+        
+        System.out.println("==Client== file length: " + file.length());     
+      } else {
+        System.out.println("There is no such file in the server storage...");
+      }
     }
   }
   

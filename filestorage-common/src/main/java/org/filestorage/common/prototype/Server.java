@@ -32,6 +32,10 @@ public class Server {
       if (command.equals(Common.PUT_FILE_CODE)) {
         put();
       }
+      
+      if (command.equals(Common.GET_FILE_CODE)) {
+        get();
+      }
     }
 
     private void put() throws IOException {
@@ -53,6 +57,34 @@ public class Server {
         System.out.println("==Server== file length: " + file.length());
       }
       quite();
+    }
+    
+    private void get() throws IOException {
+      String filename = in.readUTF();
+      File file = new File(Common.PATH_TO_SERVER_STORAGE + filename);
+      try (DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {
+        if (file.exists()) {
+          out.writeUTF(Common.OK_STATUS);
+          
+          InputStream fis = new FileInputStream(file);
+          
+          byte[] buffer = new byte[8192];
+          int edge;
+          
+          System.out.println("Bytes are ready to be transmitted...");
+          while (fis.available() > 0) {
+            edge = fis.read(buffer);
+            out.write(buffer, 0, edge);
+          }
+          
+          fis.close();
+          
+          System.out.println("==Server== file length: " + file.length());
+        } else {
+          System.out.println("File " + filename + " does not exist in the server storage...");
+          out.writeUTF(Common.OK_STATUS);
+        }
+      }
     }
     
     private void quite() throws IOException {
