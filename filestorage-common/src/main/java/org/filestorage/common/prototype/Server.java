@@ -8,13 +8,11 @@ public class Server {
   private class ClientRequestsHandler implements Runnable {
     private Socket socket;
     private DataInputStream in;
-    private DataOutputStream out;
     
     public ClientRequestsHandler(Socket socket) throws IOException {
       System.out.println("The client in thread...");
       this.socket = socket;
       this.in = new DataInputStream(socket.getInputStream());
-      this.out = new DataOutputStream(socket.getOutputStream());
       System.out.println("i/o streams has been created...");
     }
     
@@ -33,10 +31,6 @@ public class Server {
       
       if (command.equals(Common.PUT_FILE_CODE)) {
         put();
-      }
-      
-      if (command.equals(Common.EXIT_CODE)) {
-        quite();
       }
     }
 
@@ -58,11 +52,11 @@ public class Server {
         
         System.out.println("==Server== file length: " + file.length());
       }
+      quite();
     }
     
     private void quite() throws IOException {
       in.close();
-      out.close();
       socket.close();
     }
   }
