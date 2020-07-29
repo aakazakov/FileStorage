@@ -9,7 +9,21 @@ public class Client {
 
   public Client() throws IOException {
     connect();
-    put(new File("d:/tmp/test.pdf"));
+    
+    Scanner scanner = new Scanner(System.in);
+    String command;
+    
+    System.out.print("Command: ");
+    command = scanner.nextLine();
+    
+    if (command.equals(Common.EXIT_CODE)) {
+      quite();
+    }
+    
+    if (command.equals(Common.PUT_FILE_CODE)) {
+      put(new File("d:/tmp/test.pdf"));
+    }   
+    
   }
 
   private void connect() throws IOException {
@@ -24,10 +38,12 @@ public class Client {
   private void put(File file) throws IOException {
     if (file.exists()) {
 
-      try (DataInputStream in = new DataInputStream(socket.getInputStream());
-          DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+      try (DataOutputStream out = new DataOutputStream(socket.getOutputStream());
           InputStream fis = new FileInputStream(file);) {
+        
         System.out.println("i/o streams has been created...");
+        
+        out.writeUTF(Common.PUT_FILE_CODE);
 
         out.writeUTF(file.getName());
         byte[] buffer = new byte[8192];
@@ -44,6 +60,13 @@ public class Client {
     } else {
       System.out.println("File does not exist...");
     }
+  }
+  
+  private void quite() throws IOException {
+    try (DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {
+      out.writeUTF(Common.EXIT_CODE);
+    }
+    socket.close();
   }
 
   public static void main(String[] args) {
