@@ -4,10 +4,10 @@ import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class Client {
+public class ClientIO {
   Socket socket;
 
-  public Client() throws IOException {
+  public ClientIO() throws IOException {
     
     Scanner scanner = new Scanner(System.in);
     String command;
@@ -15,6 +15,20 @@ public class Client {
     while (true) {
       System.out.print("Command: ");
       command = scanner.nextLine();
+      
+      if (command.equals("/t")) { // test
+        
+        try (DataInputStream in = new DataInputStream(socket.getInputStream());
+            DataOutputStream out = new DataOutputStream(socket.getOutputStream());) {
+          
+          connect();
+          
+//          out.write("test".getBytes());
+//          String response = in.readUTF();
+//          
+//          System.out.println(response);
+        }
+      }
       
       if (command.equals(Common.EXIT_CODE)) break;
       
@@ -122,7 +136,7 @@ public class Client {
   
   public static void main(String[] args) {
     try {
-      new ClientIO();
+      new Client();
     } catch (IOException e) {
       e.printStackTrace();
     }
