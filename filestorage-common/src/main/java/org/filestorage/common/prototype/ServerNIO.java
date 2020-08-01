@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.net.InetSocketAddress;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Iterator;
 
 public class ServerNIO implements Runnable {
@@ -45,6 +46,7 @@ public class ServerNIO implements Runnable {
 
           if (key.isReadable()) {
             System.out.println("Start reading...");
+            buffer.clear();
             int edge = ((SocketChannel) key.channel()).read(buffer);
             if (edge == -1) {
               key.channel().close();
@@ -56,11 +58,19 @@ public class ServerNIO implements Runnable {
             while (buffer.hasRemaining()) {
               str.append((char) buffer.get());
             }
-
-            buffer.clear();
-
+            
+            
+            byte[] b = buffer.array();
+            int limit = buffer.limit();
+            
             System.out.println(str);
             System.out.println("End reading...");
+            
+            System.out.println(b[limit - 1]);
+            if (b[limit - 1] == -1) {
+              ((SocketChannel) key.channel()).write(ByteBuffer.wrap("Server catched -1".getBytes()));
+              key.channel().close();
+            }
           }
         }
       }

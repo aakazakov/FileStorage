@@ -18,17 +18,21 @@ public class Client {
       
       if (command.equals(Common.EXIT_CODE)) break;
       
-      if (command.equals("/t")) { // test
+      if (command.equals("/t")) { // test     
         connect();
-        
         try (DataInputStream in = new DataInputStream(socket.getInputStream());
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());) {
           System.out.println("test i/o streams has been created...");
           
           out.write("test".getBytes());
-//          String response = in.readUTF();
-//          
-//          System.out.println(response);
+          out.write(new byte[] {-1});
+          
+          byte[] buffer = new byte[256];
+          int edge;
+          while ((edge = in.read(buffer)) != -1) {
+            System.out.println("OK");
+            System.out.println(new String(buffer, 0, edge));
+          }
         }
       }
       
