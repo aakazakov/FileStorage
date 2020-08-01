@@ -18,6 +18,20 @@ public class Client {
       
       if (command.equals(Common.EXIT_CODE)) break;
       
+      if (command.equals("/t")) { // test
+        connect();
+        
+        try (DataInputStream in = new DataInputStream(socket.getInputStream());
+            DataOutputStream out = new DataOutputStream(socket.getOutputStream());) {
+          System.out.println("test i/o streams has been created...");
+          
+          out.write("test".getBytes());
+//          String response = in.readUTF();
+//          
+//          System.out.println(response);
+        }
+      }
+      
       if (command.equals(Common.PUT_FILE_CODE)) {
         System.out.print("Path: ");
         command = scanner.nextLine();
@@ -122,7 +136,7 @@ public class Client {
   
   public static void main(String[] args) {
     try {
-      new ClientIO();
+      new Client();
     } catch (IOException e) {
       e.printStackTrace();
     }
