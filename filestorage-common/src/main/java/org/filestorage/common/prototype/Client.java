@@ -25,14 +25,6 @@ public class Client {
           System.out.println("test i/o streams has been created...");
           
           out.write("test".getBytes());
-          out.write(new byte[] {-1});
-          
-          byte[] buffer = new byte[256];
-          int edge;
-          while ((edge = in.read(buffer)) != -1) {
-            System.out.println("OK");
-            System.out.println(new String(buffer, 0, edge));
-          }
         }
       }
       
@@ -71,13 +63,24 @@ public class Client {
       try (DataOutputStream out = new DataOutputStream(socket.getOutputStream());
           InputStream fis = new FileInputStream(file);) {       
         System.out.println("i/o streams has been created...");
-        
-        out.writeUTF(Common.PUT_FILE_CODE);
-        out.writeUTF(file.getName());
-        
+
         byte[] buffer = new byte[8192];
         int edge;
-
+        
+        out.write(Common.longToBytes((long) Common.PUT_FILE_CODE.length()));
+        out.write(Common.PUT_FILE_CODE.getBytes());
+        
+        
+        out.write(Common.longToBytes(file.getName().length()));
+        out.write(file.getName().getBytes());
+        
+        out.write(Common.longToBytes(file.length()));
+        try {
+          Thread.sleep(5);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+        
         System.out.println("Bytes are ready to be transmitted...");
         while (fis.available() > 0) {
           edge = fis.read(buffer);

@@ -4,15 +4,59 @@ import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.net.InetSocketAddress;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Iterator;
 
-public class ServerNIO implements Runnable {
+public class ServerNIO {
+  private class ClientRequestsHandler {
+    private void accept(SelectionKey key) throws IOException {
+      SocketChannel channel = ((ServerSocketChannel) key.channel()).accept();
+      channel.configureBlocking(false);
+      System.out.println("Client has been accepted...");
+      channel.register(selector, SelectionKey.OP_READ);
+      System.out.println("Server is ready to read...");
+    }
+    
+    private void read(SelectionKey key) throws IOException {
+      System.out.println("Start reading...");
+      buffer.clear();
+      SocketChannel channel = (SocketChannel) key.channel();
+      int edge = channel.read(buffer);
+      if (edge == -1) {
+        channel.close();
+      }
+
+      buffer.flip();
+      
+      if (buffer.hasRemaining() && buffer.get() == Common.SIGNAL) {
+        byte[] bytes = new byte[8];
+        for (int i = 0; i < 8; i++) {
+          bytes[i] = buffer.get();
+        }
+        long length = Common.bytesToLong(bytes);
+        System.out.println(length);
+      } else {
+        buffer.position(0);
+      }
+      
+      StringBuilder str = new StringBuilder();
+      while (buffer.hasRemaining()) {
+        char ch = (char) buffer.get();
+        str.append(ch);
+      }
+
+      System.out.println(str);
+
+      System.out.println("End reading...");
+    }
+  }
+  
   private ServerSocketChannel server;
   private ByteBuffer buffer;
   private Selector selector;
+  private ClientRequestsHandler handler;
 
   public ServerNIO() throws IOException {
+    handler = new ClientRequestsHandler();
     buffer = ByteBuffer.allocate(2048);
     server = ServerSocketChannel.open();
     server.socket().bind(new InetSocketAddress(Common.PORT));
@@ -21,68 +65,32 @@ public class ServerNIO implements Runnable {
     server.register(selector, SelectionKey.OP_ACCEPT);
   }
 
-  @Override
-  public void run() {
-    try {
-      System.out.println("Server has been started...");
+  public void run() throws IOException {
+    System.out.println("Server has been started...");
 
-      while (server.isOpen()) {
-        selector.select();
+    while (server.isOpen()) {
+      selector.select();
 
-        Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
+      Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
 
-        while (iterator.hasNext()) {
-          SelectionKey key = iterator.next();
-          iterator.remove();
+      while (iterator.hasNext()) {
+        SelectionKey key = iterator.next();
+        iterator.remove();
 
-          if (key.isAcceptable()) {
-            System.out.println("Client has been accepted...");
+        if (key.isAcceptable()) {
+          handler.accept(key);
+        }
 
-            SocketChannel channel = ((ServerSocketChannel) key.channel()).accept();
-            channel.configureBlocking(false);
-            channel.register(selector, SelectionKey.OP_READ);
-            System.out.println("Server is ready to read...");
-          }
-
-          if (key.isReadable()) {
-            System.out.println("Start reading...");
-            buffer.clear();
-            int edge = ((SocketChannel) key.channel()).read(buffer);
-            if (edge == -1) {
-              key.channel().close();
-            }
-
-            buffer.flip();
-
-            StringBuilder str = new StringBuilder();
-            while (buffer.hasRemaining()) {
-              str.append((char) buffer.get());
-            }
-            
-            
-            byte[] b = buffer.array();
-            int limit = buffer.limit();
-            
-            System.out.println(str);
-            System.out.println("End reading...");
-            
-            System.out.println(b[limit - 1]);
-            if (b[limit - 1] == -1) {
-              ((SocketChannel) key.channel()).write(ByteBuffer.wrap("Server catched -1".getBytes()));
-              key.channel().close();
-            }
-          }
+        if (key.isReadable()) {
+          handler.read(key);
         }
       }
-    } catch (IOException e) {
-      e.printStackTrace();
     }
-
   }
 
   public static void main(String[] args) {
     try {
-      new Thread(new ServerNIO()).start();
+      new ServerNIO().run();
     } catch (IOException e) {
       e.printStackTrace();
     }
