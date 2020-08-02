@@ -11,6 +11,7 @@ public class Common {
   public static final String GET_LIST_CODE = "/getlist";
   public static final String OK_STATUS = "OK";
   public static final String FAIL_STATUS = "FAIL";
+  public static final byte SIGNAL = -2;
   
   public static final String PATH_TO_SERVER_STORAGE = "src/main/java/org/filestorage/common/prototype/server_storage/";
   public static final String PATH_TO_CLIENT_STORAGE = "src/main/java/org/filestorage/common/prototype/client_storage/";
@@ -20,8 +21,9 @@ public class Common {
   }
   
   public static byte[] longToBytes(long num) {
-    byte[] bytes = new byte[Long.BYTES];
-    for (int i = 7; i >= 0; i--) {
+    byte[] bytes = new byte[Long.BYTES + 1];
+    bytes[0] = SIGNAL;
+    for (int i = 8; i > 0; i--) {
       bytes[i] = (byte) (num & 0xff);
       num >>= 8;
     }
