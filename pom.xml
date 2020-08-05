@@ -8,5 +8,6 @@
   <modules>
     <module>filestorage-server</module>
     <module>filestorage-common</module>
+    <module>filestorage-client</module>
   </modules>
 </project>
