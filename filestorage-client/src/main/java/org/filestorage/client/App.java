@@ -13,7 +13,7 @@ public class App extends Application {
   @Override
   public void start(Stage stage) throws IOException {
     Parent root = FXMLLoader.load(getClass().getResource("primary.fxml"));
-    stage.setScene(new Scene(root, 640, 480));
+    stage.setScene(new Scene(root, 1024, 512));
     stage.setTitle("File cloud storage.");
     stage.show();
   }
