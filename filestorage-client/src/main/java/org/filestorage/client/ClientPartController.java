@@ -2,9 +2,7 @@ package org.filestorage.client;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -14,17 +12,18 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.TableView;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
+import javafx.scene.control.*;
 
 public class ClientPartController implements Initializable {
-  private final String START_DIR = "d:/tmp/";
   
   @FXML
-  protected TableView<FileInfo> fileTable;
+  private TableView<FileInfo> fileTable;
+  
+  @FXML
+  private ComboBox<String> volumesBox;
+  
+  @FXML
+  private TextField pathField;
 
   public void upload(ActionEvent e) {
     System.out.println(e.toString());
@@ -63,11 +62,22 @@ public class ClientPartController implements Initializable {
       new SimpleStringProperty(value.getValue().getLastModified().format(dtf)));
     
     fileTable.getColumns().addAll(filenameColumn, filesizeColumn, lastChangeColumn);
-    updateFileList(Paths.get(START_DIR));
+    
+    volumesBoxInit();
+    
+    updateFileList(Paths.get(volumesBox.getSelectionModel().getSelectedItem()));
+  }
+
+  private void volumesBoxInit() {
+    for (Path p : FileSystems.getDefault().getRootDirectories()) {
+      volumesBox.getItems().add(p.toString());
+    }
+    volumesBox.getSelectionModel().select(0);
   }
   
   public void updateFileList(Path path) {
     try {
+      pathField.setText(path.toAbsolutePath().normalize().toString().substring(3));
       fileTable.getItems().clear();
       fileTable.getItems().addAll(Files.list(path).map(FileInfo::new).collect(Collectors.toList()));
     } catch (IOException e) {
