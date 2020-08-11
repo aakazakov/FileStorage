@@ -5,5 +5,6 @@
 <HBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.filestorage.client.MainController">
   
   <fx:include fx:id = "clientPart" source = "clientPart.fxml" />
+  <fx:include fx:id = "cloudPart" source = "cloudPart.fxml" />
 	
 </HBox>
