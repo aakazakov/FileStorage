@@ -77,7 +77,7 @@ public class ClientPartController implements Initializable {
   
   public void updateFileList(Path path) {
     try {
-      pathField.setText(path.toAbsolutePath().normalize().toString().substring(3));
+      pathField.setText(path.toAbsolutePath().normalize().toString().replaceFirst("[A-Za-z]+:\\\\",""));
       fileTable.getItems().clear();
       fileTable.getItems().addAll(Files.list(path).map(FileInfo::new).collect(Collectors.toList()));
     } catch (IOException e) {
