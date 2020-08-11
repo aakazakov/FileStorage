@@ -5,6 +5,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
@@ -19,7 +20,9 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 
-public class Controller implements Initializable {
+public class ClientPartController implements Initializable {
+  private final String START_DIR = "d:/tmp/";
+  
   @FXML
   protected TableView<FileInfo> fileTable;
 
@@ -31,14 +34,12 @@ public class Controller implements Initializable {
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     TableColumn<FileInfo, String> filenameColumn = new TableColumn<>("Name");
-    filenameColumn.setCellValueFactory(file -> new SimpleStringProperty(file.getValue().getName()));
     filenameColumn.setPrefWidth(256.0);
+    filenameColumn.setCellValueFactory(value -> new SimpleStringProperty(value.getValue().getName()));
     
-    TableColumn<FileInfo, Long> filesizeColumn = new TableColumn<>("Size");
-    
-    fileTable.getColumns().addAll(filenameColumn, filesizeColumn);
-    filesizeColumn.setCellValueFactory(file -> new SimpleObjectProperty<>(file.getValue().getSize()));
-    filesizeColumn.setPrefWidth(256.0);
+    TableColumn<FileInfo, Long> filesizeColumn = new TableColumn<>("Size");    
+    filesizeColumn.setPrefWidth(128.0);
+    filesizeColumn.setCellValueFactory(value -> new SimpleObjectProperty<>(value.getValue().getSize()));
     filesizeColumn.setCellFactory(value -> new TableCell<FileInfo, Long>() {
         @Override
         protected void updateItem(Long item, boolean empty) {
@@ -55,7 +56,14 @@ public class Controller implements Initializable {
       }
     );
     
-    updateFileList(Paths.get("d:/tmp/"));
+    TableColumn<FileInfo, String> lastChangeColumn = new TableColumn<>("Last change");
+    lastChangeColumn.setPrefWidth(128.0);
+    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy.MM.dd hh:MM:ss");
+    lastChangeColumn.setCellValueFactory(value ->
+      new SimpleStringProperty(value.getValue().getLastModified().format(dtf)));
+    
+    fileTable.getColumns().addAll(filenameColumn, filesizeColumn, lastChangeColumn);
+    updateFileList(Paths.get(START_DIR));
   }
   
   public void updateFileList(Path path) {
