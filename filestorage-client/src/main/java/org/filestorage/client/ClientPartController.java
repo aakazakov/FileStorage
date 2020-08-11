@@ -25,10 +25,6 @@ public class ClientPartController implements Initializable {
   @FXML
   private TextField pathField;
 
-  public void upload(ActionEvent e) {
-    System.out.println(e.toString());
-  }
-
   @SuppressWarnings("unchecked")
   @Override
   public void initialize(URL location, ResourceBundle resources) {
@@ -61,7 +57,20 @@ public class ClientPartController implements Initializable {
     lastChangeColumn.setCellValueFactory(value ->
       new SimpleStringProperty(value.getValue().getLastModified().format(dtf)));
     
+    pathField.setEditable(false);
+    
     fileTable.getColumns().addAll(filenameColumn, filesizeColumn, lastChangeColumn);
+    fileTable.setOnMouseClicked(event -> {
+      if (event.getClickCount() == 2) {
+        Path path = Paths.get(volumesBox.getSelectionModel().getSelectedItem())
+            .resolve(pathField.getText())
+            .resolve(fileTable.getSelectionModel().getSelectedItem().getName());
+        
+        if (Files.isDirectory(path)) {
+          updateFileList(path);
+        }
+      }
+    });
     
     volumesBoxInit();
     
@@ -75,7 +84,7 @@ public class ClientPartController implements Initializable {
     volumesBox.getSelectionModel().select(0);
   }
   
-  public void updateFileList(Path path) {
+  private void updateFileList(Path path) {
     try {
       pathField.setText(path.toAbsolutePath().normalize().toString().replaceFirst("[A-Za-z]+:\\\\",""));
       fileTable.getItems().clear();
@@ -86,5 +95,28 @@ public class ClientPartController implements Initializable {
       alert.showAndWait();
     }
   }
-
+  
+  public void uploadAction(ActionEvent e) {
+    System.out.println(e.toString());
+  }
+  
+  public void goUpAction() {
+    Path path = Paths.get(getConcatinatedPath()).getParent();
+    if (path != null) {
+      updateFileList(path);
+    }
+  }
+ 
+  public void pressEnterAction() {
+    updateFileList(Paths.get(getConcatinatedPath()));
+    pathField.end();
+  }
+  
+  private String getConcatinatedPath() {
+    return volumesBox.getSelectionModel().getSelectedItem() + pathField.getText().trim();
+  }
+  
+  public void selectVolumeAction() {
+    updateFileList(Paths.get(volumesBox.getSelectionModel().getSelectedItem()));
+  }
 }

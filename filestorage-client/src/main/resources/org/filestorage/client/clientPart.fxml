@@ -11,14 +11,15 @@
 <VBox xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.filestorage.client.ClientPartController">
   
   <HBox>
-    <ComboBox fx:id = "volumesBox" />
-    <TextField fx:id = "pathField" HBox.hgrow="ALWAYS" />
+    <ComboBox fx:id="volumesBox" onAction="#selectVolumeAction" />
+    <TextField fx:id="pathField" HBox.hgrow="ALWAYS" onAction="#pressEnterAction" />
+    <Button text="UP &#129045;" onAction = "#goUpAction" />
   </HBox>
   
-  <TableView fx:id = "fileTable" VBox.vgrow="ALWAYS" />
+  <TableView fx:id="fileTable" VBox.vgrow="ALWAYS" />
   
   <HBox>
-    <Button text="Upload" onAction="#upload" />
+    <Button text="Upload" onAction="#uploadAction" />
     <padding>
        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
     </padding>
