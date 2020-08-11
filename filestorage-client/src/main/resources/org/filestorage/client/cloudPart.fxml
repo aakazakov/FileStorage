@@ -11,14 +11,14 @@
 <VBox xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.filestorage.client.CloudPartController">
   
   <HBox>
-    <ComboBox />
-    <TextField HBox.hgrow="ALWAYS" />
+    <TextField fx:id="pathField" HBox.hgrow="ALWAYS" />
+    <Button text="UP &#129045;" onAction = "#goUpAction" />
   </HBox>
   
   <TableView fx:id = "fileTable" VBox.vgrow="ALWAYS" />
   
   <HBox>
-    <Button text="Upload" onAction="#upload" />
+    <Button text="Download" onAction="#download" />
     <padding>
        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
     </padding>

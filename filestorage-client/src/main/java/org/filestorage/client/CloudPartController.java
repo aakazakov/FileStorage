@@ -14,22 +14,21 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.TableView;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
+import javafx.scene.control.*;
 
 public class CloudPartController implements Initializable {
-  private final String START_DIR = "d:/tmp/";
+  private final String START_DIR = "./CLOUD_TMP";
   
   @FXML
   protected TableView<FileInfo> fileTable;
+  
+  @FXML
+  protected TextField pathField;
 
-  public void upload(ActionEvent e) {
+  public void download(ActionEvent e) {
     System.out.println(e.toString());
   }
-
+  
   @SuppressWarnings("unchecked")
   @Override
   public void initialize(URL location, ResourceBundle resources) {
@@ -63,17 +62,28 @@ public class CloudPartController implements Initializable {
       new SimpleStringProperty(value.getValue().getLastModified().format(dtf)));
     
     fileTable.getColumns().addAll(filenameColumn, filesizeColumn, lastChangeColumn);
+    
+    pathField.setEditable(false);
+    
     updateFileList(Paths.get(START_DIR));
   }
   
   public void updateFileList(Path path) {
     try {
+      pathField.setText(path.toAbsolutePath().normalize().toString());
       fileTable.getItems().clear();
       fileTable.getItems().addAll(Files.list(path).map(FileInfo::new).collect(Collectors.toList()));
     } catch (IOException e) {
       e.printStackTrace();
       Alert alert = new Alert(Alert.AlertType.WARNING, "Oops! Can't update the file list.", ButtonType.OK);
       alert.showAndWait();
+    }
+  }
+  
+  public void goUpAction() {
+    Path path = Paths.get(pathField.getText()).getParent();
+    if (path != null) {
+      updateFileList(path);
     }
   }
 
