@@ -113,7 +113,7 @@ public class ClientPartController implements Initializable {
   }
   
   private String getConcatinatedPath() {
-    return volumesBox.getSelectionModel().getSelectedItem() + pathField.getText().trim();
+    return volumesBox.getSelectionModel().getSelectedItem() + pathField.getText();
   }
   
   public void selectVolumeAction() {
