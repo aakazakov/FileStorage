@@ -8,31 +8,12 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
 public class FileInfo {
-  public enum Type {
-    FILE("F"), DIRECTORY("D");
-  
-    private String name;
-  
-    public String getName() {
-      return this.name;
-    }
-  
-    Type(String name) {
-      this.name = name;
-    }
-  }
-
   private String name;
-  private Type type;
   private long size;
   private LocalDateTime lastModified;
 
   public String getName() {
     return name;
-  }
-
-  public Type getType() {
-    return type;
   }
 
   public long getSize() {
@@ -47,10 +28,8 @@ public class FileInfo {
     try {
       this.name = path.getFileName().toString();
       if (Files.isDirectory(path)) {
-        this.type = Type.DIRECTORY;
         this.size = -1L;
       } else {
-        this.type = Type.FILE;
         this.size = Files.size(path);
       }
       this.lastModified = LocalDateTime.ofInstant(Files.getLastModifiedTime(path).toInstant(), ZoneOffset.ofHours(0));
