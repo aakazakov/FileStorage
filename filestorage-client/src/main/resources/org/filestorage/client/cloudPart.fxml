@@ -17,8 +17,9 @@
   
   <TableView fx:id = "fileTable" VBox.vgrow="ALWAYS" />
   
-  <HBox>
-    <Button text="Download" onAction="#download" />
+  <HBox spacing="5">
+    <Button text="Download" onAction="#downloadAction" HBox.hgrow="ALWAYS" maxWidth="Infinity"  />
+    <Button text="Remove" onAction="#removeAction" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
     <padding>
        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
     </padding>

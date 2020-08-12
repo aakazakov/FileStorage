@@ -25,7 +25,11 @@ public class CloudPartController implements Initializable {
   @FXML
   protected TextField pathField;
 
-  public void download(ActionEvent e) {
+  public void downloadAction(ActionEvent e) {
+    System.out.println(e.toString());
+  }
+  
+  public void removeAction(ActionEvent e) {
     System.out.println(e.toString());
   }
   
