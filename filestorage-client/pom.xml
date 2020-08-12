@@ -15,6 +15,11 @@
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
     <dependencies>
+		   <dependency>
+		     <groupId>com.myproject</groupId>
+		     <artifactId>filestorage-common</artifactId>
+		     <version>0.0.1-SNAPSHOT</version>
+		   </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
