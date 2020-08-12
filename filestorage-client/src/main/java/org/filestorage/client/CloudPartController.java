@@ -66,6 +66,16 @@ public class CloudPartController implements Initializable {
       new SimpleStringProperty(value.getValue().getLastModified().format(dtf)));
     
     fileTable.getColumns().addAll(filenameColumn, filesizeColumn, lastChangeColumn);
+    fileTable.setOnMouseClicked(event -> {
+      if (event.getClickCount() == 2) {
+        Path path = Paths.get(pathField.getText())
+            .resolve(fileTable.getSelectionModel().getSelectedItem().getName());
+        
+        if (Files.isDirectory(path)) {
+          updateFileList(path);
+        }
+      }
+    });
     
     pathField.setEditable(false);
     
