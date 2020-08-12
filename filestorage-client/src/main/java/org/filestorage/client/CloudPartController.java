@@ -25,14 +25,6 @@ public class CloudPartController implements Initializable {
   @FXML
   protected TextField pathField;
 
-  public void downloadAction(ActionEvent e) {
-    System.out.println(e.toString());
-  }
-  
-  public void removeAction(ActionEvent e) {
-    System.out.println(e.toString());
-  }
-  
   @SuppressWarnings("unchecked")
   @Override
   public void initialize(URL location, ResourceBundle resources) {
@@ -100,5 +92,16 @@ public class CloudPartController implements Initializable {
       updateFileList(path);
     }
   }
-
+  
+  public void downloadAction(ActionEvent e) {
+    System.out.println(e.toString());
+  }
+  
+  public void removeAction(ActionEvent e) {
+    System.out.println(e.toString());
+  }
+  
+  public void createDirAction(ActionEvent e) {
+    System.out.println(e.toString());
+  }
 }
