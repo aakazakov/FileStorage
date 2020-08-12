@@ -1,4 +1,4 @@
-package org.filestorage.client;
+package org.filestorage.client.fxcontrollers;
 
 import java.io.IOException;
 import java.net.URL;
@@ -6,6 +6,8 @@ import java.nio.file.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
+
+import org.filestorage.client.FileInfo;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
