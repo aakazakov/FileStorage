@@ -107,6 +107,8 @@ public class ClientPartController implements Initializable {
     }
   }
  
+  // TODO Remove this method...
+  // no need this...
   public void pressEnterAction() {
     updateFileList(Paths.get(getConcatinatedPath()));
     pathField.end();
