@@ -64,8 +64,7 @@ public class ClientPartController implements Initializable {
     fileTable.getColumns().addAll(filenameColumn, filesizeColumn, lastChangeColumn);
     fileTable.setOnMouseClicked(event -> {
       if (event.getClickCount() == 2) {
-        Path path = Paths.get(volumesBox.getSelectionModel().getSelectedItem())
-            .resolve(pathField.getText())
+        Path path = getCurrentPath()
             .resolve(fileTable.getSelectionModel().getSelectedItem().getName());
         
         if (Files.isDirectory(path)) {
@@ -76,7 +75,7 @@ public class ClientPartController implements Initializable {
     
     volumesBoxInit();
     
-    updateFileList(Paths.get(volumesBox.getSelectionModel().getSelectedItem()));
+    updateFileList(getCurrentPath());
   }
 
   private void volumesBoxInit() {
@@ -108,24 +107,25 @@ public class ClientPartController implements Initializable {
   }
   
   public void goUpAction() {
-    Path path = Paths.get(getConcatinatedPath()).getParent();
+    Path path = getCurrentPath().getParent();
     if (path != null) {
       updateFileList(path);
     }
   }
  
-  // TODO Remove this method...
-  // no need this...
-  public void pressEnterAction() {
-    updateFileList(Paths.get(getConcatinatedPath()));
-    pathField.end();
-  }
-  
-  private String getConcatinatedPath() {
-    return volumesBox.getSelectionModel().getSelectedItem() + pathField.getText();
-  }
-  
   public void selectVolumeAction() {
     updateFileList(Paths.get(volumesBox.getSelectionModel().getSelectedItem()));
   }
+  
+  // TODO Remove this method...
+  // no need this...
+  public void pressEnterAction() {
+    updateFileList(getCurrentPath());
+    pathField.end();
+  }
+  
+  private Path getCurrentPath() {
+    return Paths.get(volumesBox.getSelectionModel().getSelectedItem()).resolve(pathField.getText());
+  }
+  
 }

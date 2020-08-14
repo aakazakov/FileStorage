@@ -80,7 +80,12 @@ public class CloudPartController implements Initializable {
     try {
       pathField.setText(path.toAbsolutePath().normalize().toString());
       fileTable.getItems().clear();
-      fileTable.getItems().addAll(Files.list(path).map(FileInfo::new).collect(Collectors.toList()));
+      fileTable.getItems().addAll(
+          Files
+          .list(path)
+          .filter(Files::isReadable)
+          .map(FileInfo::new)
+          .collect(Collectors.toList()));
     } catch (IOException e) {
       e.printStackTrace();
       Alert alert = new Alert(Alert.AlertType.WARNING, "Oops! Can't update the file list.", ButtonType.OK);
