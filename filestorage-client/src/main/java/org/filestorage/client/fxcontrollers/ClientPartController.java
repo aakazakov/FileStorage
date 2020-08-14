@@ -117,13 +117,6 @@ public class ClientPartController implements Initializable {
     updateFileList(Paths.get(volumesBox.getSelectionModel().getSelectedItem()));
   }
   
-  // TODO Remove this method...
-  // no need this...
-  public void pressEnterAction() {
-    updateFileList(getCurrentPath());
-    pathField.end();
-  }
-  
   private Path getCurrentPath() {
     return Paths.get(volumesBox.getSelectionModel().getSelectedItem()).resolve(pathField.getText());
   }
