@@ -1,6 +1,7 @@
 package org.filestorage.server;
 
 import org.filestorage.common.Config;
+import org.filestorage.server.handlers.Reciever;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -24,15 +25,24 @@ public class ServerApp {
 
          @Override
          protected void initChannel(SocketChannel ch) throws Exception {
-           
+           ch.pipeline().addLast(new Reciever());
          }
 
        });
       ChannelFuture future = b.bind(Config.PORT).sync();
+      System.out.println("Server has been started...");
       future.channel().closeFuture().sync();
     } finally {
       bossGroup.shutdownGracefully();
       workerGroup.shutdownGracefully();
+    }
+  }
+  
+  public static void main(String[] args) {
+    try {
+      new ServerApp().run();
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 }
