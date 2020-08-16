@@ -19,10 +19,13 @@ public class Reciever extends ChannelInboundHandlerAdapter  {
   @Override
   public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
     ByteBuf buf = (ByteBuf) msg;
+    System.out.println("Bytes in buffer (without '\\n\\r'): " + (buf.writerIndex() - 2));
+    System.out.println("Start reading...");
     while (buf.isReadable()) {
       System.out.print((char) buf.readByte());
       System.out.flush();
     }
+    System.out.println("Stop reading...");
     buf.release();
   }
 
