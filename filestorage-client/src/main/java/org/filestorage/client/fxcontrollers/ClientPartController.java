@@ -7,7 +7,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
-import org.filestorage.client.FileInfo;
+import org.filestorage.client.entity.FileInfo;
+import org.filestorage.client.network.Interaction;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -102,8 +103,13 @@ public class ClientPartController implements Initializable {
     }
   }
   
-  public void uploadAction(ActionEvent e) {
-    System.out.println(e.toString());
+  public void uploadAction(ActionEvent event) {
+    System.out.println(event.toString());
+    try {
+      new Interaction().put();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
   
   public void goUpAction() {
