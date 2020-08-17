@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.Socket;
 
 import org.filestorage.common.Config;
+import org.filestorage.common.Constants;
 
 public class Interaction {
 
@@ -13,7 +14,7 @@ public class Interaction {
   public void put() throws IOException {
     connect();
     try (DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {
-      out.write("Hello".getBytes());
+      out.write(Constants.PUT);
     }
   }
   
