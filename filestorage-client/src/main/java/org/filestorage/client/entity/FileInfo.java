@@ -1,4 +1,4 @@
-package org.filestorage.client;
+package org.filestorage.client.entity;
 
 import java.io.IOException;
 

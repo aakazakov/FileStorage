@@ -9,7 +9,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
-import org.filestorage.client.FileInfo;
+import org.filestorage.client.entity.FileInfo;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
