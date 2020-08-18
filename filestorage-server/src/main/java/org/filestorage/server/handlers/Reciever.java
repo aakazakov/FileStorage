@@ -1,7 +1,5 @@
 package org.filestorage.server.handlers;
 
-import org.filestorage.common.Constants;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -21,17 +19,16 @@ public class Reciever extends ChannelInboundHandlerAdapter  {
   @Override
   public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
     ByteBuf buf = (ByteBuf) msg;
-    byte command;
     System.out.println("Bytes in buffer: " + buf.writerIndex());
-    System.out.println("Start reading...");
+    System.out.println("Reading start...");
+    long start = System.currentTimeMillis(); // test.
+    
     while (buf.isReadable()) {
-      command = buf.getByte(0);
-      if (command == Constants.PUT) {
-        System.out.print(command);
-        System.out.flush();
-      }
+     System.out.print(buf.readByte());
+     System.out.flush();
     }
-    System.out.println("\nStop reading...");
+    
+    System.out.println("\nReading finish... " + (System.currentTimeMillis() - start) + " ms.");
     buf.release();
   }
 

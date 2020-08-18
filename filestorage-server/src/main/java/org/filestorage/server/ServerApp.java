@@ -39,10 +39,12 @@ public class ServerApp {
   }
   
   public static void main(String[] args) {
-    try {
-      new ServerApp().run();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+    new Thread (() -> {
+      try {
+        new ServerApp().run();
+      } catch (Exception e) {
+        e.printStackTrace();
+      } 
+     }).start();
   }
 }

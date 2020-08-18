@@ -1,5 +1,6 @@
 package org.filestorage.client.fxcontrollers;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.*;
@@ -106,7 +107,10 @@ public class ClientPartController implements Initializable {
   public void uploadAction(ActionEvent event) {
     System.out.println(event.toString());
     try {
-      new Interaction().put();
+      File file = getSelectedFile();
+      if (file != null) {
+        new Interaction().put(file);
+      }
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -121,6 +125,12 @@ public class ClientPartController implements Initializable {
  
   public void selectVolumeAction() {
     updateFileList(Paths.get(volumesBox.getSelectionModel().getSelectedItem()));
+  }
+  
+  private File getSelectedFile() {
+    FileInfo select = fileTable.getSelectionModel().getSelectedItem();
+    if (select == null || select.getSize() == -1) return null; // files only, not dirs.
+    return getCurrentPath().resolve(select.getName()).toFile();
   }
   
   private Path getCurrentPath() {
