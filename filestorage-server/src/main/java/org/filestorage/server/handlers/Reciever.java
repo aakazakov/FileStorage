@@ -24,7 +24,7 @@ public class Reciever extends ChannelInboundHandlerAdapter  {
     long start = System.currentTimeMillis(); // test.
     
     while (buf.isReadable()) {
-     System.out.print(buf.readByte());
+     System.out.print((char) buf.readByte());
      System.out.flush();
     }
     

@@ -1,12 +1,13 @@
 package org.filestorage.client.network;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.Socket;
 
 import org.filestorage.common.Config;
-import org.filestorage.common.Constants;
 
 public class Interaction {
 
@@ -14,14 +15,18 @@ public class Interaction {
   
   public void put(File file) throws IOException {
     connect();
-    try (DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {
+    try (DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+        DataInputStream in = new DataInputStream(new FileInputStream(file));) {
       
-      System.out.println(file.getName());
-      System.out.println(file.length());
+      byte[] buffer = new byte[512];
+      int edge;
       
       System.out.println("Writing start...");
       
-      out.write(Constants.PUT);
+      while (in.available() > 0) {
+        edge = in.read(buffer);
+        out.write(buffer, 0, edge);
+      }
       
       System.out.println("Writing finish...");
     }
