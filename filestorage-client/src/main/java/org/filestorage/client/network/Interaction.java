@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.Socket;
 
 import org.filestorage.common.Config;
+import org.filestorage.common.Constants;
 
 public class Interaction {
 
@@ -23,6 +24,10 @@ public class Interaction {
       int edge;
       
       System.out.println("Writing start...");
+      
+      out.writeByte(Constants.PUT);
+      
+      System.out.println(in.readByte() == Constants.PUT);
       
       while (fis.available() > 0) {
         edge = fis.read(buffer);
