@@ -16,23 +16,26 @@ public class Interaction {
   public void put(File file) throws IOException {
     connect();
     try (DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-        DataInputStream in = new DataInputStream(new FileInputStream(file));) {
+        DataInputStream in = new DataInputStream(socket.getInputStream());
+        FileInputStream fis = new FileInputStream(file);) {
       
       byte[] buffer = new byte[512];
       int edge;
       
       System.out.println("Writing start...");
       
-      while (in.available() > 0) {
-        edge = in.read(buffer);
+      while (fis.available() > 0) {
+        edge = fis.read(buffer);
         out.write(buffer, 0, edge);
       }
       
+      System.out.println(in.readByte());
+            
       System.out.println("Writing finish...");
     }
     disconnect();
   }
-  
+    
   private void connect() throws IOException {
     socket = new Socket(Config.HOST, Config.PORT);
     System.out.println("Сlient connected to server...");

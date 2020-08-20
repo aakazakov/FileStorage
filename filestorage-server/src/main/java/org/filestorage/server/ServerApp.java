@@ -10,6 +10,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.bytes.ByteArrayEncoder;
 
 public class ServerApp {
 
@@ -25,9 +26,8 @@ public class ServerApp {
 
          @Override
          protected void initChannel(SocketChannel ch) throws Exception {
-           ch.pipeline().addLast(new Reciever());
+           ch.pipeline().addLast(new ByteArrayEncoder(), new Reciever());
          }
-
        });
       ChannelFuture future = b.bind(Config.PORT).sync();
       System.out.println("Server has been started...");
