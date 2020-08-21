@@ -1,5 +1,10 @@
 package org.filestorage.server.handlers;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.filestorage.common.Constants;
 
 import io.netty.buffer.ByteBuf;
@@ -25,52 +30,67 @@ public class Reciever extends ChannelInboundHandlerAdapter  {
   }
 
   @Override
-  public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-    ByteBuf buf = (ByteBuf) msg;
-    
+  public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {   
     switch (action) {
       case Constants.PUT:
-        put(ctx, buf);
+        put(ctx, msg);
         break;
       case Constants.GET:
-        get(ctx, buf);
+        get(ctx, msg);
         break;
       case Constants.GET_LIST:
-        getList(ctx, buf);
+        getList(ctx, msg);
         break;
       default:
+        ByteBuf buf = (ByteBuf) msg;
         action = buf.getByte(0);
         ctx.writeAndFlush(new byte[] {action});
     }
   }
   
-  private void put(ChannelHandlerContext ctx, ByteBuf buf) {
-    System.out.println("Reading start...");
-    System.out.println("Buffer info: " + buf);
-    long start = System.currentTimeMillis(); // test.
-    
-    System.out.println("action: " + action);
+  private void put(ChannelHandlerContext ctx, Object msg) throws IOException {  
+    if (msg instanceof String) {
+      String fileName = (String) msg;
+      createFile(fileName);
+      System.out.println(fileName);
+      ctx.writeAndFlush(new byte[] {Constants.PUT});
+    } else {
+      ByteBuf buf = (ByteBuf) msg;
+      
+      System.out.println("Buffer info: " + buf);
+      System.out.println("action: " + action);
+      System.out.println("Reading start...");
+      long start = System.currentTimeMillis();
 
-    while (buf.isReadable()) {
-      System.out.print((char) buf.readByte());
-      System.out.flush();
+      while (buf.isReadable()) {
+        System.out.print((char) buf.readByte());
+        System.out.flush();
+      }
+      
+      System.out.println("Buffer info: " + buf);
+      
+      buf.release();     
+      
+      ctx.writeAndFlush(new byte[] {Constants.PUT});
+      
+      System.out.println("\nReading finish... " + (System.currentTimeMillis() - start) + " ms.");
     }
-    
-    System.out.println("\nBuffer info: " + buf);
-    
-    buf.release();
-    
-    ctx.writeAndFlush(new byte[] {Constants.PUT});
-    
-    System.out.println("\nReading finish... " + (System.currentTimeMillis() - start) + " ms.");
   }
   
-  private void get(ChannelHandlerContext ctx, ByteBuf buf) {
-    System.out.println("ctx: " + ctx + " / msg: " + buf);
+  private boolean createFile(String fileName) throws IOException { // Can i be here ????
+    Path path = (Paths.get("./TMP_STORAGE/" + fileName));
+    System.out.println("./TMP_STORAGE/" + fileName);
+    Files.deleteIfExists(path);
+    Files.createFile(path);
+    return Files.exists(path);
   }
   
-  private void getList(ChannelHandlerContext ctx, ByteBuf buf) {
-    System.out.println("ctx: " + ctx + " / msg: " + buf);
+  private void get(ChannelHandlerContext ctx, Object msg) {
+    System.out.println("ctx: " + ctx + " / msg: " + msg);
+  }
+  
+  private void getList(ChannelHandlerContext ctx, Object msg) {
+    System.out.println("ctx: " + ctx + " / msg: " + msg);
   }
 
   @Override

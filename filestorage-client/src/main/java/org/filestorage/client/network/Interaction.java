@@ -26,15 +26,16 @@ public class Interaction {
       System.out.println("Writing start...");
       
       out.writeByte(Constants.PUT);
-      
-      System.out.println(in.readByte() == Constants.PUT);
+      System.out.println(in.readByte());
+      out.writeUTF(file.getName());     
+      System.out.println(in.readByte());
       
       while (fis.available() > 0) {
         edge = fis.read(buffer);
         out.write(buffer, 0, edge);
       }
       
-      System.out.println(in.readByte());
+      System.out.println(in.readByte() == Constants.PUT);
             
       System.out.println("Writing finish...");
     }
