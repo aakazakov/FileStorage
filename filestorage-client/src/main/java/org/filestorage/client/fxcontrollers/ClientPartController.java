@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import org.filestorage.client.entity.FileInfo;
 import org.filestorage.client.network.Interaction;
+import org.filestorage.common.exceptions.OnServerException;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -111,8 +112,10 @@ public class ClientPartController implements Initializable {
       if (file != null) {
         new Interaction().put(file);
       }
-    } catch (IOException e) {
+    } catch (IOException | OnServerException e) {
       e.printStackTrace();
+      Alert alert = new Alert(Alert.AlertType.WARNING, "Oops! Can't put file in storage.", ButtonType.OK);
+      alert.showAndWait();
     }
   }
   

@@ -10,12 +10,13 @@ import java.net.Socket;
 import org.filestorage.common.Config;
 import org.filestorage.common.Constants;
 import org.filestorage.common.Utility;
+import org.filestorage.common.exceptions.OnServerException;
 
 public class Interaction {
 
   private Socket socket;
   
-  public void put(File file) throws IOException {
+  public void put(File file) throws IOException, OnServerException {
     connect();
     try (DataOutputStream out = new DataOutputStream(socket.getOutputStream());
         DataInputStream in = new DataInputStream(socket.getInputStream());
@@ -28,15 +29,15 @@ public class Interaction {
       out.writeByte(Constants.PUT);
       serverResponse = in.readByte();
       if (serverResponse != Constants.PUT)
-        throw new RuntimeException("Server response: " + serverResponse);
+        throw new OnServerException("send PUT command", serverResponse);
       out.write(file.getName().getBytes());
       serverResponse = in.readByte();
       if (serverResponse != Constants.PUT)
-        throw new RuntimeException("Server response: " + serverResponse);
+        throw new OnServerException("send file name", serverResponse);
       out.write(Utility.longToBytes(file.length()));
       serverResponse = in.readByte();
       if (serverResponse != Constants.PUT)
-        throw new RuntimeException("Server response: " + serverResponse);
+        throw new OnServerException("send file length", serverResponse);
       
       while (fis.available() > 0) {
         edge = fis.read(buffer);
@@ -45,7 +46,7 @@ public class Interaction {
      
       serverResponse = in.readByte();
       if (serverResponse != Constants.PUT)
-        throw new RuntimeException("Server response: " + serverResponse);
+        throw new OnServerException("just wait server OK", serverResponse);
     }
     disconnect();
   }

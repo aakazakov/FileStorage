@@ -101,6 +101,8 @@ public class MainHandler extends ChannelInboundHandlerAdapter  {
 
   @Override
   public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    ctx.writeAndFlush(new byte[] { Constants.FAIL });
+    Files.deleteIfExists(file);
     cause.printStackTrace();
     ctx.close();
   }  
