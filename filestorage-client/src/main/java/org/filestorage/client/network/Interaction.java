@@ -9,6 +9,7 @@ import java.net.Socket;
 
 import org.filestorage.common.Config;
 import org.filestorage.common.Constants;
+import org.filestorage.common.Utility;
 
 public class Interaction {
 
@@ -27,7 +28,9 @@ public class Interaction {
       
       out.writeByte(Constants.PUT);
       System.out.println(in.readByte());
-      out.writeUTF(file.getName());     
+      out.write(file.getName().getBytes());
+      System.out.println(in.readByte());
+      out.write(Utility.longToBytes(file.length()));
       System.out.println(in.readByte());
       
       while (fis.available() > 0) {

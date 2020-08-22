@@ -2,8 +2,10 @@ package org.filestorage.server.handlers;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 import org.filestorage.common.Constants;
 
@@ -14,9 +16,13 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 public class Reciever extends ChannelInboundHandlerAdapter  {
   
   private byte action;
+  private Path file;
+  private long fileSize;
   
   public Reciever() {
     action = 0;
+    file = null;
+    fileSize = 0;
   }
   
   @Override
@@ -26,71 +32,75 @@ public class Reciever extends ChannelInboundHandlerAdapter  {
 
   @Override
   public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-    System.out.println("Channel has been inactivated. Context name: " + ctx.name());
+    System.out.println("\nChannel has been inactivated. Context name: " + ctx.name());
   }
 
   @Override
   public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {   
+    ByteBuf buf = (ByteBuf) msg;
     switch (action) {
       case Constants.PUT:
-        put(ctx, msg);
+        put(ctx, buf);
         break;
       case Constants.GET:
-        get(ctx, msg);
+        get(ctx, buf);
         break;
       case Constants.GET_LIST:
-        getList(ctx, msg);
+        getList(ctx, buf);
         break;
       default:
-        ByteBuf buf = (ByteBuf) msg;
         action = buf.getByte(0);
-        ctx.writeAndFlush(new byte[] {action});
+        ctx.writeAndFlush(new byte[] { action });
     }
   }
   
-  private void put(ChannelHandlerContext ctx, Object msg) throws IOException {  
-    if (msg instanceof String) {
-      String fileName = (String) msg;
-      createFile(fileName);
-      System.out.println(fileName);
-      ctx.writeAndFlush(new byte[] {Constants.PUT});
+  private void put(ChannelHandlerContext ctx, ByteBuf buf) throws IOException { 
+    if (file == null) {
+      createFile(buf);
+      System.out.println("Filename: " + file.getFileName().toString());
+      ctx.writeAndFlush(new byte[] { Constants.PUT });
+    } else if (fileSize == 0) {
+      initFileSize(buf);
+      System.out.println("Filesize: " + fileSize);
+      ctx.writeAndFlush(new byte[] { Constants.PUT });
     } else {
-      ByteBuf buf = (ByteBuf) msg;
-      
-      System.out.println("Buffer info: " + buf);
-      System.out.println("action: " + action);
-      System.out.println("Reading start...");
-      long start = System.currentTimeMillis();
-
-      while (buf.isReadable()) {
-        System.out.print((char) buf.readByte());
-        System.out.flush();
+      writeFile(ctx, buf);
+      if (Files.size(file) == fileSize) {
+        ctx.writeAndFlush(new byte[] { Constants.PUT });      
       }
-      
-      System.out.println("Buffer info: " + buf);
-      
-      buf.release();     
-      
-      ctx.writeAndFlush(new byte[] {Constants.PUT});
-      
-      System.out.println("\nReading finish... " + (System.currentTimeMillis() - start) + " ms.");
     }
   }
   
-  private boolean createFile(String fileName) throws IOException { // Can i be here ????
-    Path path = (Paths.get("./TMP_STORAGE/" + fileName));
-    System.out.println("./TMP_STORAGE/" + fileName);
-    Files.deleteIfExists(path);
-    Files.createFile(path);
-    return Files.exists(path);
+  private void createFile(ByteBuf buf) throws IOException {
+    StringBuilder fileName = new StringBuilder();
+    while (buf.isReadable()) {
+      fileName.append((char) buf.readByte());
+    }
+    buf.release();
+    file = Paths.get("TMP_STORAGE/").resolve(fileName.toString());
+    Files.deleteIfExists(file);
+    Files.createFile(file);
   }
   
-  private void get(ChannelHandlerContext ctx, Object msg) {
-    System.out.println("ctx: " + ctx + " / msg: " + msg);
+  private void initFileSize(ByteBuf buf) {
+    fileSize = buf.readLong();
+    buf.release();
   }
   
-  private void getList(ChannelHandlerContext ctx, Object msg) {
-    System.out.println("ctx: " + ctx + " / msg: " + msg);
+  private void writeFile(ChannelHandlerContext ctx, ByteBuf buf) throws IOException {
+    byte[] bytes = new byte[buf.writerIndex()];
+    buf.readBytes(bytes);
+    Files.write(file, bytes, StandardOpenOption.APPEND);
+    buf.release();
+    System.out.println("size: " + (fileSize == Files.size(file)));
+  }
+  
+  private void get(ChannelHandlerContext ctx, ByteBuf buf) {
+    System.out.println("ctx: " + ctx + " / msg: " + buf);
+  }
+  
+  private void getList(ChannelHandlerContext ctx, ByteBuf buf) {
+    System.out.println("ctx: " + ctx + " / msg: " + buf);
   }
 
   @Override
