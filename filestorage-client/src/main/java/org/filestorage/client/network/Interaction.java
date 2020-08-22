@@ -19,28 +19,33 @@ public class Interaction {
     connect();
     try (DataOutputStream out = new DataOutputStream(socket.getOutputStream());
         DataInputStream in = new DataInputStream(socket.getInputStream());
-        FileInputStream fis = new FileInputStream(file);) {
-      
+        FileInputStream fis = new FileInputStream(file);) {     
       byte[] buffer = new byte[512];
       int edge;
+      byte serverResponse;
       
-      System.out.println("Writing start...");
-      
+      // TODO code below needs optimization)).
       out.writeByte(Constants.PUT);
-      System.out.println(in.readByte());
+      serverResponse = in.readByte();
+      if (serverResponse != Constants.PUT)
+        throw new RuntimeException("Server response: " + serverResponse);
       out.write(file.getName().getBytes());
-      System.out.println(in.readByte());
+      serverResponse = in.readByte();
+      if (serverResponse != Constants.PUT)
+        throw new RuntimeException("Server response: " + serverResponse);
       out.write(Utility.longToBytes(file.length()));
-      System.out.println(in.readByte());
+      serverResponse = in.readByte();
+      if (serverResponse != Constants.PUT)
+        throw new RuntimeException("Server response: " + serverResponse);
       
       while (fis.available() > 0) {
         edge = fis.read(buffer);
         out.write(buffer, 0, edge);
       }
-      
-      System.out.println(in.readByte() == Constants.PUT);
-            
-      System.out.println("Writing finish...");
+     
+      serverResponse = in.readByte();
+      if (serverResponse != Constants.PUT)
+        throw new RuntimeException("Server response: " + serverResponse);
     }
     disconnect();
   }

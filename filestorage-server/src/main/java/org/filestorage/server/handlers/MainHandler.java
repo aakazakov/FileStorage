@@ -2,7 +2,6 @@ package org.filestorage.server.handlers;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -13,13 +12,13 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
-public class Reciever extends ChannelInboundHandlerAdapter  {
+public class MainHandler extends ChannelInboundHandlerAdapter  {
   
   private byte action;
   private Path file;
   private long fileSize;
   
-  public Reciever() {
+  public MainHandler() {
     action = 0;
     file = null;
     fileSize = 0;
@@ -57,16 +56,14 @@ public class Reciever extends ChannelInboundHandlerAdapter  {
   private void put(ChannelHandlerContext ctx, ByteBuf buf) throws IOException { 
     if (file == null) {
       createFile(buf);
-      System.out.println("Filename: " + file.getFileName().toString());
       ctx.writeAndFlush(new byte[] { Constants.PUT });
     } else if (fileSize == 0) {
       initFileSize(buf);
-      System.out.println("Filesize: " + fileSize);
       ctx.writeAndFlush(new byte[] { Constants.PUT });
     } else {
-      writeFile(ctx, buf);
+      writeFile(buf);
       if (Files.size(file) == fileSize) {
-        ctx.writeAndFlush(new byte[] { Constants.PUT });      
+        ctx.writeAndFlush(new byte[] { Constants.PUT }); 
       }
     }
   }
@@ -87,12 +84,11 @@ public class Reciever extends ChannelInboundHandlerAdapter  {
     buf.release();
   }
   
-  private void writeFile(ChannelHandlerContext ctx, ByteBuf buf) throws IOException {
+  private void writeFile(ByteBuf buf) throws IOException {
     byte[] bytes = new byte[buf.writerIndex()];
     buf.readBytes(bytes);
     Files.write(file, bytes, StandardOpenOption.APPEND);
     buf.release();
-    System.out.println("size: " + (fileSize == Files.size(file)));
   }
   
   private void get(ChannelHandlerContext ctx, ByteBuf buf) {

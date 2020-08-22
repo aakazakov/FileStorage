@@ -1,7 +1,7 @@
 package org.filestorage.server;
 
 import org.filestorage.common.Config;
-import org.filestorage.server.handlers.Reciever;
+import org.filestorage.server.handlers.MainHandler;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -29,7 +29,7 @@ public class ServerApp {
 
          @Override
          protected void initChannel(SocketChannel ch) throws Exception {
-           ch.pipeline().addLast(new ByteArrayEncoder(), new Reciever());
+           ch.pipeline().addLast(new ByteArrayEncoder(), new MainHandler());
          }
        });
       ChannelFuture future = b.bind(Config.PORT).sync();
