@@ -10,6 +10,8 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 import org.filestorage.client.entity.FileInfo;
+import org.filestorage.client.network.Interaction;
+import org.filestorage.common.exceptions.OnServerException;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -100,8 +102,14 @@ public class CloudPartController implements Initializable {
     }
   }
   
-  public void downloadAction(ActionEvent e) {
-    System.out.println(e.toString());
+  public void downloadAction(ActionEvent event) {
+    try {
+      new Interaction().getFileList();
+    } catch (IOException | OnServerException | ClassNotFoundException e) {
+      e.printStackTrace();
+      Alert alert = new Alert(Alert.AlertType.WARNING, "Oops! Can't get file list.", ButtonType.OK);
+      alert.showAndWait();
+    }
   }
   
   public void removeAction(ActionEvent e) {

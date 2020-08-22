@@ -50,6 +50,28 @@ public class Interaction {
     }
     disconnect();
   }
+  
+  public void getFileList() throws IOException, OnServerException, ClassNotFoundException {
+    connect();
+    
+    try (DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+        DataInputStream in = new DataInputStream(socket.getInputStream());) {
+      byte serverResponse;
+      
+      out.writeByte(Constants.GET_LIST);          
+      serverResponse = in.readByte();
+      if (serverResponse != Constants.GET_LIST)
+        throw new OnServerException("send GET_LIST command", serverResponse);
+      
+      out.writeByte(Constants.GET_LIST);          
+      serverResponse = in.readByte();
+      if (serverResponse != Constants.GET_LIST)
+        throw new OnServerException("send GET_LIST command", serverResponse);
+
+    }
+    
+    disconnect();
+  }
     
   private void connect() throws IOException {
     socket = new Socket(Config.HOST, Config.PORT);

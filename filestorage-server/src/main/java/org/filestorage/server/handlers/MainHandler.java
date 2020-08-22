@@ -5,12 +5,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.filestorage.common.Constants;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.codec.serialization.ObjectEncoder;
 
 public class MainHandler extends ChannelInboundHandlerAdapter  {
   
@@ -95,8 +98,15 @@ public class MainHandler extends ChannelInboundHandlerAdapter  {
     System.out.println("ctx: " + ctx + " / msg: " + buf);
   }
   
-  private void getList(ChannelHandlerContext ctx, ByteBuf buf) {
+  private void getList(ChannelHandlerContext ctx, ByteBuf buf) throws IOException {
     System.out.println("ctx: " + ctx + " / msg: " + buf);
+    ctx.writeAndFlush(new byte[] { Constants.GET_LIST });
+    List<String> list = Files
+        .list(Paths.get("TMP_STORAGE"))
+        .map(p -> p.getFileName().toString())
+        .collect(Collectors.toList());
+    System.out.println(list);
+//    ctx.pipeline().addFirst(new ObjectEncoder()).writeAndFlush(list);
   }
 
   @Override
