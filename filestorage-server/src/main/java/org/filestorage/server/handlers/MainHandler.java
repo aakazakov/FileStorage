@@ -1,7 +1,10 @@
 package org.filestorage.server.handlers;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,6 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.filestorage.common.Constants;
+import org.filestorage.common.Utility;
 import org.filestorage.common.entity.FileInfo;
 import org.filestorage.common.entity.FileList;
 
@@ -75,18 +79,14 @@ public class MainHandler extends ChannelInboundHandlerAdapter {
       writeFile(buf);
       if (Files.size(file) == fileSize) {
         file = null;
+        fileSize = 0;
         ctx.writeAndFlush(new byte[] { Constants.PUT });
       }
     }
   }
   
   private void createFile(ByteBuf buf) throws IOException {
-    StringBuilder fileName = new StringBuilder();
-    while (buf.isReadable()) {
-      fileName.append((char) buf.readByte());
-    }
-    buf.release();
-    file = Paths.get("TMP_STORAGE/").resolve(fileName.toString());
+    initFile(buf);
     Files.deleteIfExists(file);
     Files.createFile(file);
   }
@@ -103,8 +103,34 @@ public class MainHandler extends ChannelInboundHandlerAdapter {
     buf.release();
   }
   
-  private void get(ChannelHandlerContext ctx, ByteBuf buf) {
-    System.out.println("ctx: " + ctx + " / msg: " + buf);
+  // do not work yet ))
+  private void get(ChannelHandlerContext ctx, ByteBuf buf) throws IOException {
+    if (file == null) {
+      initFile(buf);
+      ctx.writeAndFlush(new byte[] { Constants.GET });
+    } else if (fileSize == 0) {
+      fileSize = Files.size(file);
+      buf.release();
+      ctx.writeAndFlush(Utility.longToBytes(fileSize));
+    } else {
+      buf.release();
+      InputStream in = Files.newInputStream(file);
+      byte[] b = new byte[512];
+      while (in.available() > 0) {
+        in.read(b);
+        ctx.writeAndFlush(b);
+      }
+      in.close();
+    }
+  }
+  
+  private void initFile(ByteBuf buf) {
+    StringBuilder fileName = new StringBuilder();
+    while (buf.isReadable()) {
+      fileName.append((char) buf.readByte());
+    }
+    buf.release();
+    file = Paths.get("TMP_STORAGE/").resolve(fileName.toString());
   }
   
   private void getList(ChannelHandlerContext ctx, ByteBuf buf) throws IOException {

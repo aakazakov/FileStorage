@@ -8,7 +8,7 @@ import java.util.ResourceBundle;
 import org.filestorage.client.network.Interaction;
 import org.filestorage.common.entity.FileInfo;
 import org.filestorage.common.entity.FileList;
-import org.filestorage.common.exceptions.OnServerException;
+import org.filestorage.common.exceptions.OnProcessException;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -69,7 +69,7 @@ public class CloudPartController implements Initializable {
       FileList fileList = new Interaction().getFileList();
       pathField.setText(fileList.getRoot());
       fileTable.getItems().addAll(fileList.getList());
-    } catch (IOException | OnServerException | ClassNotFoundException e) {
+    } catch (IOException | OnProcessException | ClassNotFoundException e) {
       e.printStackTrace();
       Alert alert = new Alert(Alert.AlertType.WARNING, "Oops! Can't update the file list.", ButtonType.OK);
       alert.showAndWait();
@@ -77,13 +77,27 @@ public class CloudPartController implements Initializable {
   }
   
   public void downloadAction(ActionEvent event) {
-    System.out.println(event.toString());
+    FileInfo file = fileTable.getSelectionModel().getSelectedItem();
+    if (file == null) return;
+    try {
+      new Interaction().get(file.getName());
+    } catch (IOException | OnProcessException e) {
+      e.printStackTrace();
+      Alert alert = new Alert(Alert.AlertType.WARNING, "Oops! Can't download file.", ButtonType.OK);
+      alert.showAndWait();
+    }
   }
   
-  public void removeAction(ActionEvent event) throws IOException, OnServerException {
+  public void removeAction(ActionEvent event) {
     FileInfo file = fileTable.getSelectionModel().getSelectedItem();
     if (file != null) {
-      new Interaction().removeFile(file.getName());
+      try {
+        new Interaction().removeFile(file.getName());
+      } catch (IOException | OnProcessException e) {
+        e.printStackTrace();
+        Alert alert = new Alert(Alert.AlertType.WARNING, "Oops! Can't remove file.", ButtonType.OK);
+        alert.showAndWait();
+      }
     }
   }
 }

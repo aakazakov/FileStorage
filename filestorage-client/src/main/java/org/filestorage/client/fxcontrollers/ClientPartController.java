@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 import org.filestorage.client.network.Interaction;
 import org.filestorage.common.entity.FileInfo;
-import org.filestorage.common.exceptions.OnServerException;
+import org.filestorage.common.exceptions.OnProcessException;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -79,6 +79,7 @@ public class ClientPartController implements Initializable {
     volumesBoxInit();
     
     updateFileList(getCurrentPath());
+    System.out.println("Client initialization complete...");
   }
 
   private void volumesBoxInit() {
@@ -110,15 +111,20 @@ public class ClientPartController implements Initializable {
     try {
       File file = getSelectedFile();
       if (file != null) {
-        new Interaction().put(file);
+        new Interaction().put(file);        
+        updateCloudPartFileList();     
       }
-    } catch (IOException | OnServerException e) {
+    } catch (IOException | OnProcessException e) {
       e.printStackTrace();
       Alert alert = new Alert(Alert.AlertType.WARNING, "Oops! Can't put file in storage.", ButtonType.OK);
       alert.showAndWait();
     }
   }
   
+  private void updateCloudPartFileList() {
+    
+  }
+
   public void goUpAction() {
     Path path = getCurrentPath().getParent();
     if (path != null) {
