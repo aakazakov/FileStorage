@@ -2,12 +2,8 @@ package org.filestorage.client.fxcontrollers;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 
 import org.filestorage.client.network.Interaction;
 import org.filestorage.common.entity.FileInfo;
@@ -22,7 +18,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 
 public class CloudPartController implements Initializable {
-  private final String START_DIR = "./CLOUD_TMP";
   
   @FXML
   protected TableView<FileInfo> fileTable;
@@ -70,7 +65,7 @@ public class CloudPartController implements Initializable {
   }
   
   public void updateFileList() {
-    try {      
+    try {  
       FileList fileList = new Interaction().getFileList();
       pathField.setText(fileList.getRoot());
       fileTable.getItems().addAll(fileList.getList());
@@ -85,7 +80,10 @@ public class CloudPartController implements Initializable {
     System.out.println(event.toString());
   }
   
-  public void removeAction(ActionEvent event) {
-    System.out.println(event.toString());
+  public void removeAction(ActionEvent event) throws IOException, OnServerException {
+    FileInfo file = fileTable.getSelectionModel().getSelectedItem();
+    if (file != null) {
+      new Interaction().removeFile(file.getName());
+    }
   }
 }

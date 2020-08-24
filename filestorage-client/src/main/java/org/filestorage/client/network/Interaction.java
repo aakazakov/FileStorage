@@ -74,6 +74,27 @@ public class Interaction {
     disconnect();
     return fileList;
   }
+  
+  public void removeFile(String filename) throws IOException, OnServerException {
+    connect();
+    
+    try (DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+        DataInputStream in = new DataInputStream(socket.getInputStream());) {
+      byte serverResponse;
+      
+      out.writeByte(Constants.REMOVE);
+      serverResponse = in.readByte();
+      if (serverResponse != Constants.REMOVE)
+        throw new OnServerException("send REMOVE command", serverResponse);
+           
+      out.write(filename.getBytes());
+      serverResponse = in.readByte();
+      if (serverResponse != Constants.REMOVE)
+        throw new OnServerException("send the filename to remove", serverResponse);
+    }
+    
+    disconnect();
+  }
     
   private void connect() throws IOException {
     socket = new Socket(Config.HOST, Config.PORT);

@@ -10,6 +10,7 @@ public class Constants {
   public static final byte START = -124;
   public static final byte END = -123;
   public static final byte FAIL = -122;
+  public static final byte REMOVE = -121;
   
   public static String getConstantName(byte value) {
     Class<Constants> constants = Constants.class;

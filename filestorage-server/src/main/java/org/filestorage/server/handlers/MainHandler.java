@@ -18,7 +18,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
-public class MainHandler extends ChannelInboundHandlerAdapter  {
+public class MainHandler extends ChannelInboundHandlerAdapter {
   
   private byte action;
   private Path file;
@@ -54,6 +54,9 @@ public class MainHandler extends ChannelInboundHandlerAdapter  {
         break;
       case Constants.GET_LIST:
         getList(ctx, buf);
+        break;
+      case Constants.REMOVE:
+        remove(ctx, buf);
         break;
       default:
         action = buf.getByte(0);
@@ -105,8 +108,7 @@ public class MainHandler extends ChannelInboundHandlerAdapter  {
   }
   
   private void getList(ChannelHandlerContext ctx, ByteBuf buf) throws IOException {
-    List<FileInfo> list = Files
-        .list(Paths.get("TMP_STORAGE"))
+    List<FileInfo> list = Files.list(Paths.get("TMP_STORAGE"))
         .map(FileInfo::new)
         .collect(Collectors.toList());
     fileList.setList(list);
@@ -117,6 +119,22 @@ public class MainHandler extends ChannelInboundHandlerAdapter  {
     objOut.close();
     ctx.writeAndFlush(byteArr.toByteArray());
   }
+  
+  private void remove(ChannelHandlerContext ctx, ByteBuf buf) throws IOException {
+    StringBuilder filename = new StringBuilder();    
+    while (buf.isReadable()) {
+      filename.append((char) buf.readByte());
+    }
+    buf.release();
+    
+    Path path = Paths.get("TMP_STORAGE").resolve(filename.toString());    
+    boolean removed = Files.deleteIfExists(path);   
+    if (removed) {
+      ctx.writeAndFlush(new byte[] { Constants.REMOVE });
+    } else {
+      ctx.writeAndFlush(new byte[] { Constants.FAIL });
+    }
+  }
 
   @Override
   public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
@@ -124,5 +142,5 @@ public class MainHandler extends ChannelInboundHandlerAdapter  {
     Files.deleteIfExists(file);
     cause.printStackTrace();
     ctx.close();
-  }  
+  }
 }
