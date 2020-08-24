@@ -5,11 +5,13 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.Socket;
 
 import org.filestorage.common.Config;
 import org.filestorage.common.Constants;
 import org.filestorage.common.Utility;
+import org.filestorage.common.entity.FileList;
 import org.filestorage.common.exceptions.OnServerException;
 
 public class Interaction {
@@ -52,8 +54,7 @@ public class Interaction {
   }
   
   public void getFileList() throws IOException, OnServerException, ClassNotFoundException {
-    connect();
-    
+    connect();   
     try (DataOutputStream out = new DataOutputStream(socket.getOutputStream());
         DataInputStream in = new DataInputStream(socket.getInputStream());) {
       byte serverResponse;
@@ -63,13 +64,13 @@ public class Interaction {
       if (serverResponse != Constants.GET_LIST)
         throw new OnServerException("send GET_LIST command", serverResponse);
       
-      out.writeByte(Constants.GET_LIST);          
-      serverResponse = in.readByte();
-      if (serverResponse != Constants.GET_LIST)
-        throw new OnServerException("send GET_LIST command", serverResponse);
-
-    }
-    
+      out.writeByte(Constants.GET_LIST);
+      
+      ObjectInputStream objIn = new ObjectInputStream(in);
+      FileList fileList = (FileList) objIn.readObject();
+      objIn.close();
+      System.out.println(fileList.getList());
+    }    
     disconnect();
   }
     

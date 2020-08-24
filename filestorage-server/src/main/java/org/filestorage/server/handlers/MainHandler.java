@@ -1,6 +1,8 @@
 package org.filestorage.server.handlers;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -9,22 +11,25 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.filestorage.common.Constants;
+import org.filestorage.common.entity.FileInfo;
+import org.filestorage.common.entity.FileList;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.codec.serialization.ObjectEncoder;
 
 public class MainHandler extends ChannelInboundHandlerAdapter  {
   
   private byte action;
   private Path file;
   private long fileSize;
+  private FileList fileList;
   
   public MainHandler() {
     action = 0;
     file = null;
     fileSize = 0;
+    fileList = new FileList();
   }
   
   @Override
@@ -66,7 +71,8 @@ public class MainHandler extends ChannelInboundHandlerAdapter  {
     } else {
       writeFile(buf);
       if (Files.size(file) == fileSize) {
-        ctx.writeAndFlush(new byte[] { Constants.PUT }); 
+        file = null;
+        ctx.writeAndFlush(new byte[] { Constants.PUT });
       }
     }
   }
@@ -99,14 +105,17 @@ public class MainHandler extends ChannelInboundHandlerAdapter  {
   }
   
   private void getList(ChannelHandlerContext ctx, ByteBuf buf) throws IOException {
-    System.out.println("ctx: " + ctx + " / msg: " + buf);
-    ctx.writeAndFlush(new byte[] { Constants.GET_LIST });
-    List<String> list = Files
+    List<FileInfo> list = Files
         .list(Paths.get("TMP_STORAGE"))
-        .map(p -> p.getFileName().toString())
+        .map(FileInfo::new)
         .collect(Collectors.toList());
-    System.out.println(list);
-//    ctx.pipeline().addFirst(new ObjectEncoder()).writeAndFlush(list);
+    fileList.setList(list);
+    
+    ByteArrayOutputStream byteArr = new ByteArrayOutputStream();
+    ObjectOutputStream objOut = new ObjectOutputStream(byteArr);
+    objOut.writeObject(fileList);
+    objOut.close();
+    ctx.writeAndFlush(byteArr.toByteArray());
   }
 
   @Override
