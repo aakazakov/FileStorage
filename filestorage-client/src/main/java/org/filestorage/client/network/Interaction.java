@@ -53,7 +53,8 @@ public class Interaction {
     disconnect();
   }
   
-  public void getFileList() throws IOException, OnServerException, ClassNotFoundException {
+  public FileList getFileList() throws IOException, OnServerException, ClassNotFoundException {
+    FileList fileList = null;
     connect();   
     try (DataOutputStream out = new DataOutputStream(socket.getOutputStream());
         DataInputStream in = new DataInputStream(socket.getInputStream());) {
@@ -67,11 +68,11 @@ public class Interaction {
       out.writeByte(Constants.GET_LIST);
       
       ObjectInputStream objIn = new ObjectInputStream(in);
-      FileList fileList = (FileList) objIn.readObject();
+      fileList = (FileList) objIn.readObject();
       objIn.close();
-      System.out.println(fileList.getList());
     }    
     disconnect();
+    return fileList;
   }
     
   private void connect() throws IOException {

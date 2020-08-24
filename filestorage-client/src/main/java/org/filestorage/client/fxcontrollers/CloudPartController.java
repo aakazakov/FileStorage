@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import org.filestorage.client.network.Interaction;
 import org.filestorage.common.entity.FileInfo;
+import org.filestorage.common.entity.FileList;
 import org.filestorage.common.exceptions.OnServerException;
 
 import javafx.beans.property.SimpleObjectProperty;
@@ -62,61 +63,29 @@ public class CloudPartController implements Initializable {
       new SimpleStringProperty(value.getValue().getLastModified().format(dtf)));
     
     fileTable.getColumns().addAll(filenameColumn, filesizeColumn, lastChangeColumn);
-    fileTable.setOnMouseClicked(event -> {
-      if (event.getClickCount() == 2) {
-        Path path = Paths.get(pathField.getText())
-            .resolve(fileTable.getSelectionModel().getSelectedItem().getName());
-        
-        if (Files.isDirectory(path)) {
-          updateFileList(path);
-        }
-      }
-    });
     
     pathField.setEditable(false);
     
-    updateFileList(Paths.get(START_DIR));
+    updateFileList();
   }
   
-  public void updateFileList(Path path) {
-    try {
-      pathField.setText(path.toAbsolutePath().normalize().toString());
-      fileTable.getItems().clear();
-      fileTable.getItems().addAll(
-          Files
-          .list(path)
-          .filter(Files::isReadable)
-          .map(FileInfo::new)
-          .collect(Collectors.toList()));
-    } catch (IOException e) {
+  public void updateFileList() {
+    try {      
+      FileList fileList = new Interaction().getFileList();
+      pathField.setText(fileList.getRoot());
+      fileTable.getItems().addAll(fileList.getList());
+    } catch (IOException | OnServerException | ClassNotFoundException e) {
       e.printStackTrace();
       Alert alert = new Alert(Alert.AlertType.WARNING, "Oops! Can't update the file list.", ButtonType.OK);
       alert.showAndWait();
     }
   }
   
-  public void goUpAction() {
-    Path path = Paths.get(pathField.getText()).getParent();
-    if (path != null) {
-      updateFileList(path);
-    }
-  }
-  
   public void downloadAction(ActionEvent event) {
-    try {
-      new Interaction().getFileList();
-    } catch (IOException | OnServerException | ClassNotFoundException e) {
-      e.printStackTrace();
-      Alert alert = new Alert(Alert.AlertType.WARNING, "Oops! Can't get file list.", ButtonType.OK);
-      alert.showAndWait();
-    }
+    System.out.println(event.toString());
   }
   
-  public void removeAction(ActionEvent e) {
-    System.out.println(e.toString());
-  }
-  
-  public void createDirAction(ActionEvent e) {
-    System.out.println(e.toString());
+  public void removeAction(ActionEvent event) {
+    System.out.println(event.toString());
   }
 }
