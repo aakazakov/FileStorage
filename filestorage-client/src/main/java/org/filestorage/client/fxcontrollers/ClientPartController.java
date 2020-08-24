@@ -8,8 +8,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
-import org.filestorage.client.entity.FileInfo;
 import org.filestorage.client.network.Interaction;
+import org.filestorage.common.entity.FileInfo;
 import org.filestorage.common.exceptions.OnServerException;
 
 import javafx.beans.property.SimpleObjectProperty;
